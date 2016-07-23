@@ -22,8 +22,7 @@ Route::group(array('prefix' => 'api'), function()
 
 
 Route::get('/', function() {
-    return view('user.create');
-    //return \App\Book::all();
+    return 'Use API';
 });
 
 

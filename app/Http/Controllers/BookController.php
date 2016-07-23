@@ -12,8 +12,6 @@ use App\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 
-;
-
 class BookController extends Controller
 {
     /**
@@ -23,6 +21,7 @@ class BookController extends Controller
      */
     public function index()
     {
+        //Предоставление списка книг, имеющихся в библиотеке
         $response = [];
         try {
             $statusCode = 200;
@@ -40,7 +39,7 @@ class BookController extends Controller
                 ];
             }
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $statusCode = 404;
         } finally {
             return Response::json($response, $statusCode);
@@ -49,6 +48,7 @@ class BookController extends Controller
 
     public function returnBook($id, $uid)
     {
+        // Возвращать книгу от определенного пользователя в билиотеку
         try {
             $response = '';
             $statusCode = 200;
@@ -64,6 +64,9 @@ class BookController extends Controller
             $book->save();
             $response = Book::find($id);
 
+        } catch (ModelNotFoundException $mex) {
+            $statusCode = 404;
+            $response = ['error' => 'ID\'s are invalid.'];
         } catch (\Exception $ex) {
             $statusCode = 404;
             $response = ['error' => $ex->getMessage()];
@@ -80,6 +83,7 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
+        // Добавление новой книги в библиотеку
         $statusCode = 201;
         $rules = [
             'title' => ['required'],
@@ -108,18 +112,11 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        try {
-            $statusCode = 200;
-            $response = '';
+        //Предоставление детальной инорфмации о книге
+        $statusCode = 200;
 
-            $response = Book::findOrFail($id);
-
-        } catch (\Exception $ex) {
-            $statusCode = 404;
-            $response = ['error' => 'Specified Book ID is not valid'];
-        } finally {
-            return Response::json($response, $statusCode);
-        }
+        $response = Book::findOrFail($id);
+        return Response::json($response, $statusCode);
     }
 
     /**
@@ -153,20 +150,13 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        try {
-            $responseCode = 202;
-            $response = '';
+        // Списание книги из библиотеки
+        $responseCode = 202;
+        $response = ['status' => 'success'];
 
-            $book = Book::findOrFail($id);
-            $book->delete();
+        $book = Book::findOrFail($id);
+        $book->delete();
 
-            $response = ['status' => 'success'];
-
-        } catch (\Exception $ex) {
-            $responseCode = 404;
-            $response = ['error' => 'Specified Book ID is not valid'];
-        } finally {
-            return Response::json($response, $responseCode);
-        }
+        return Response::json($response, $responseCode);
     }
 }

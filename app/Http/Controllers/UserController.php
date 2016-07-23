@@ -13,6 +13,7 @@ use App\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Redirect;
 
+
 class UserController extends Controller
 {
 
@@ -33,6 +34,7 @@ class UserController extends Controller
 
     public function userBooks($id)
     {
+        //Предоставление списка книг, которые взял определенный пользователь
         try {
             $statusCode = 200;
             $user = User::findOrFail($id);
@@ -47,9 +49,9 @@ class UserController extends Controller
                     'year' => $book->year
                 ];
             }
-        } catch (ModelNotFoundException $ex) {
+        } catch (\Exception $ex) {
             $statusCode = 404;
-            $response = ['error' => 'Invalid User ID'];
+            $response = ['error' => $ex->getMessage()];
         } finally {
             return Response::json($response, $statusCode);
         }
@@ -58,9 +60,10 @@ class UserController extends Controller
 
     public function giveBook($id, $bid)
     {
+        // Присваивать книгу определенному пользователю
         try {
             $statusCode = 200;
-            $response = '';
+            $response = ['status' => 'success'];
 
             $user = User::findOrFail($id);
             $book = Book::findOrFail($bid);
@@ -72,7 +75,6 @@ class UserController extends Controller
             $user->books()->save($book);
             $user->save();
 
-            $response = ['status' => 'success'];
         } catch (\Exception $ex) {
             $statusCode = 404;
             $response = ['error' => $ex->getMessage()];
@@ -109,18 +111,11 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        try {
-            $user = User::findOrFail($id);
-            $statusCode = 200;
-            $response = $user;
-        } catch (ModelNotFoundException $ex) {
-            $statusCode = 404;
-            $response = 'Invalid User Id';
-        } finally {
-            return Response::json($response, $statusCode);
-        }
-
+    {   //Возвращать данные профиля об определенном пользователе
+        $user = User::findOrFail($id);
+        $statusCode = 200;
+        $response = $user;
+        return Response::json($response, $statusCode);
     }
 
     /**

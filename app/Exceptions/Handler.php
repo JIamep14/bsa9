@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use App\Http\Requests\Request;
 use Exception;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -45,6 +47,13 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
+
+        if ($e instanceof ModelNotFoundException) {
+            if($request->is('api/*')) {
+                return Response::json(['error' => 'Some of specified ID\'s are invalid.'], 404);
+            }
+        }
+
         return parent::render($request, $e);
     }
 }
