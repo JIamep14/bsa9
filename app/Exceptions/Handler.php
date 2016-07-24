@@ -30,7 +30,7 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Exception  $e
+     * @param  \Exception $e
      * @return void
      */
     public function report(Exception $e)
@@ -41,16 +41,18 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $e
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Exception $e
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $e)
     {
-
-        if ($e instanceof ModelNotFoundException) {
-            if($request->is('api/*')) {
-                return Response::json(['error' => 'Some of specified ID\'s are invalid.'], 404);
+        if ($request->is('api/*')) {
+            if ($e instanceof ModelNotFoundException) {
+                return Response::json(['error' => 'Some of specified ID\'s are invalid.'], 400);
+            }
+            else if ($e instanceof MyException) {
+                return Response::json(['error' => $e->getMessage()], 404);
             }
         }
 
