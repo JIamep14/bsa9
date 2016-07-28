@@ -19,7 +19,20 @@ class UserController extends Controller
      */
     public function index()
     {
+        $response = [];
+        $statusCode = 200;
+        $users = User::all();
 
+        foreach ($users as $user) {
+
+            $response[] = [
+                'id' => $user->id,
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'email' => $user->email
+            ];
+        }
+        return Response::json($response, $statusCode);
     }
 
     public function userBooks($id)
